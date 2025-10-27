@@ -11,35 +11,36 @@ public class WeaponController : MonoBehaviour
     public int maxAmmo = 30;
     public float baseAttackDamage = 10f;
 
-    private int currentAmmo;
-    private bool isReloading = false;
-    private float nextFireTime = 0f;
+    [Header("이펙트 설정")]
+    public GameObject muzzleFlashPrefab;     
+    public float muzzleFlashDuration = 0.05f;
 
+    public Vector3 muzzleLocalPosition = Vector3.zero;
+    public Vector3 muzzleLocalEuler = Vector3.zero;
+    public bool keepPrefabWorldScale = false;
+
+    private float nextFireTime = 0f;
     private PlayerController player;
 
     void Start()
     {
         player = GetComponentInParent<PlayerController>();
-        currentAmmo = maxAmmo;
-
-        if (player != null)
-        {
-            player.currentAmmo = currentAmmo;
-            player.magazineSize = maxAmmo;
-            player.UpdateUI();
-        }
+        player.currentAmmo = maxAmmo;
+        player.magazineSize = maxAmmo;
+        player.UpdateUI();
     }
 
     void Update()
     {
-        if (isReloading) return;
+        if (player == null) return;
+        if (player.isReloading) return;
 
         if (Input.GetButton("Fire1") && Time.time >= nextFireTime)
         {
             Fire();
         }
 
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.R) && !player.isReloading)
         {
             StartCoroutine(Reload());
         }
@@ -47,7 +48,7 @@ public class WeaponController : MonoBehaviour
 
     void Fire()
     {
-        if (currentAmmo <= 0)
+        if (player.currentAmmo <= 0)
         {
             StartCoroutine(Reload());
             return;
@@ -61,13 +62,29 @@ public class WeaponController : MonoBehaviour
 
         Bullet bulletComp = bullet.GetComponent<Bullet>();
         if (bulletComp != null)
-        {
             bulletComp.damage = finalDamage;
+
+        if (muzzleFlashPrefab != null)
+        {
+            GameObject flash = Instantiate(muzzleFlashPrefab, firePoint, false);
+            flash.transform.localPosition = muzzleLocalPosition;         
+            flash.transform.localRotation = Quaternion.Euler(muzzleLocalEuler);
+
+            if (keepPrefabWorldScale)
+            {
+                Vector3 parentLossy = firePoint.lossyScale;
+                Vector3 desired = muzzleFlashPrefab.transform.localScale; 
+                flash.transform.localScale = new Vector3(
+                    desired.x / Mathf.Max(parentLossy.x, 1e-6f),
+                    desired.y / Mathf.Max(parentLossy.y, 1e-6f),
+                    desired.z / Mathf.Max(parentLossy.z, 1e-6f)
+                );
+            }
+
+            Destroy(flash, muzzleFlashDuration);
         }
 
-        currentAmmo--;
-        player.currentAmmo = currentAmmo; 
-        player.UpdateUI();
+        player.ConsumeAmmo();
 
         float actualFireRate = baseFireRate / player.reloadSpeedMultiplier;
         nextFireTime = Time.time + actualFireRate;
@@ -75,21 +92,13 @@ public class WeaponController : MonoBehaviour
 
     IEnumerator Reload()
     {
-        isReloading = true;
-        Debug.Log("재장전 중...");
-
-        float reloadTime = baseReloadTime / player.reloadSpeedMultiplier;
+        if (player == null) yield break;
+        if (player.isReloading) yield break;
 
         player.isReloading = true;
-        player.StartCoroutine(player.ReloadCoroutine(reloadTime));
+        Debug.Log("재장전 중...");
 
-        yield return new WaitForSeconds(reloadTime);
-
-        currentAmmo = maxAmmo;
-        player.currentAmmo = currentAmmo;
-        player.isReloading = false;
-        player.UpdateUI();
-        isReloading = false;
+        yield return player.StartCoroutine(player.ReloadCoroutine());
 
         Debug.Log("재장전 완료!");
     }

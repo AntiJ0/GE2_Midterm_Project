@@ -30,6 +30,7 @@ public class PlayerController : MonoBehaviour
     public TMP_Text reloadTimerText;
     public Image hpBarFill;
     public TMP_Text hpText;
+    public GameObject gameOverPanel;
 
     private Coroutine reloadRoutine;
 
@@ -47,12 +48,17 @@ public class PlayerController : MonoBehaviour
             hpBarFill.fillAmount = 1f;
         }
 
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false); 
+
         reloadTimerText.gameObject.SetActive(false);
         UpdateUI();
     }
 
     private void Update()
     {
+        if (curHP <= 0) return;
+
         HandleMovement();
         HandleReloadInput();
 
@@ -147,7 +153,23 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
+        if (curHP <= 0) return;
+
         curHP = Mathf.Max(0, curHP - amount);
         UpdateUI();
+
+        if (curHP <= 0)
+        {
+            GameOver();
+        }
+    }
+
+    private void GameOver()
+    {
+        Time.timeScale = 0f; 
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(true);
+        Cursor.lockState = CursorLockMode.None; 
+        Cursor.visible = true;
     }
 }
