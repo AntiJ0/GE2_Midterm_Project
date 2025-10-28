@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
@@ -10,8 +10,12 @@ public class Zombie : MonoBehaviour
     private Transform target;
     private float curHP;
     private bool isAttacking = false;
-    private ZombieHealthBar healthBar; 
+    private ZombieHealthBar healthBar;
     private Rigidbody rb;
+
+    private Renderer[] renderers;
+    private Color originalColor;
+    private bool isFlashing = false;
 
     public void Initialize(ZombieSO so)
     {
@@ -33,6 +37,10 @@ public class Zombie : MonoBehaviour
         healthBar = GetComponentInChildren<ZombieHealthBar>();
         if (healthBar != null)
             healthBar.UpdateHealthBar(curHP, data.maxHP);
+
+        renderers = GetComponentsInChildren<Renderer>();
+        if (renderers.Length > 0)
+            originalColor = renderers[0].material.color;
     }
 
     void Update()
@@ -104,10 +112,50 @@ public class Zombie : MonoBehaviour
         if (healthBar != null)
             healthBar.UpdateHealthBar(curHP, data.maxHP);
 
+        if (!isFlashing)
+            StartCoroutine(FlashRed());
+
         if (curHP <= 0)
         {
-            Destroy(gameObject);
+            OnDeath();
         }
+    }
+
+    void OnDeath()
+    {
+        if (target != null)
+        {
+            PlayerController player = target.GetComponent<PlayerController>();
+            if (player != null)
+                player.AddGold(data.rewardGold);
+        }
+
+        Destroy(gameObject);
+    }
+
+    IEnumerator FlashRed()
+    {
+        isFlashing = true;
+
+        foreach (Renderer rend in renderers)
+        {
+            MaterialPropertyBlock block = new MaterialPropertyBlock();
+            rend.GetPropertyBlock(block);
+            block.SetColor("_Color", Color.red);
+            rend.SetPropertyBlock(block);
+        }
+
+        yield return new WaitForSeconds(0.2f);
+
+        foreach (Renderer rend in renderers)
+        {
+            MaterialPropertyBlock block = new MaterialPropertyBlock();
+            rend.GetPropertyBlock(block);
+            block.SetColor("_Color", originalColor);
+            rend.SetPropertyBlock(block);
+        }
+
+        isFlashing = false;
     }
 
     void FixedUpdate()

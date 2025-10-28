@@ -19,3 +19,4 @@ MonoBehaviour:
   attackRange: 5
   attackCooldown: 3
   isBoss: 1
+  rewardGold: 500

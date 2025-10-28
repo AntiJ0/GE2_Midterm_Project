@@ -10,4 +10,5 @@ public class ZombieSO : ScriptableObject
     public float attackRange = 2f;
     public float attackCooldown = 2f;
     public bool isBoss = false;
+    public int rewardGold = 10;
 }

@@ -235,6 +235,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fillImage: {fileID: 1202270372987982528}
+  hideDistance: 27
 --- !u!1 &5218498900481030047
 GameObject:
   m_ObjectHideFlags: 0

@@ -386,6 +386,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fillImage: {fileID: 9205662760338493638}
+  hideDistance: 27
 --- !u!1001 &7050164411243780775
 PrefabInstance:
   m_ObjectHideFlags: 0

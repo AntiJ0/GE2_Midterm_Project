@@ -25,6 +25,11 @@ public class PlayerController : MonoBehaviour
     public float reloadTime = 2f;
     [HideInInspector] public bool isReloading = false;
 
+    [Header("°ñµå °ü·Ã")]
+    public int totalGold = 0;   
+    public int stageGold = 0;   
+    public TMP_Text goldText;   
+
     [Header("UI")]
     public TMP_Text ammoText;
     public TMP_Text reloadTimerText;
@@ -40,6 +45,11 @@ public class PlayerController : MonoBehaviour
         curHP = maxHP;
         currentAmmo = magazineSize;
 
+        totalGold = PlayerPrefs.GetInt("TotalGold", 0);
+        stageGold = 0;
+
+        ApplyUpgradesFromPrefs();
+
         if (hpBarFill != null)
         {
             hpBarFill.type = Image.Type.Filled;
@@ -49,7 +59,7 @@ public class PlayerController : MonoBehaviour
         }
 
         if (gameOverPanel != null)
-            gameOverPanel.SetActive(false); 
+            gameOverPanel.SetActive(false);
 
         reloadTimerText.gameObject.SetActive(false);
         UpdateUI();
@@ -61,10 +71,6 @@ public class PlayerController : MonoBehaviour
 
         HandleMovement();
         HandleReloadInput();
-
-        if (Input.GetKeyDown(KeyCode.H))
-            TakeDamage(10f);
-
         UpdateUI();
     }
 
@@ -102,7 +108,9 @@ public class PlayerController : MonoBehaviour
     public IEnumerator ReloadCoroutine()
     {
         isReloading = true;
-        float adjustedReloadTime = reloadTime / reloadSpeedMultiplier;
+
+        float adjustedReloadTime = reloadTime * reloadSpeedMultiplier; 
+
         float remainingTime = adjustedReloadTime;
         reloadTimerText.gameObject.SetActive(true);
 
@@ -132,6 +140,20 @@ public class PlayerController : MonoBehaviour
 
         if (ammoText != null)
             ammoText.text = $"{currentAmmo} / ¡Ä";
+
+        if (goldText != null)
+            goldText.text = $"{stageGold} G";
+    }
+
+    public void AddGold(int amount)
+    {
+        stageGold += amount;
+        totalGold += amount;
+
+        PlayerPrefs.SetInt("TotalGold", totalGold);
+        PlayerPrefs.Save();
+
+        UpdateUI();
     }
 
     public void ConsumeAmmo()
@@ -166,10 +188,25 @@ public class PlayerController : MonoBehaviour
 
     private void GameOver()
     {
-        Time.timeScale = 0f; 
+        Time.timeScale = 0f;
         if (gameOverPanel != null)
             gameOverPanel.SetActive(true);
-        Cursor.lockState = CursorLockMode.None; 
+        Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+    }
+
+    private void ApplyUpgradesFromPrefs()
+    {
+        int moveSpeedLevel = PlayerPrefs.GetInt("MoveSpeedLevel", 0);
+        int attackLevel = PlayerPrefs.GetInt("AttackLevel", 0);
+        int hpLevel = PlayerPrefs.GetInt("HPLevel", 0);
+        int reloadLevel = PlayerPrefs.GetInt("ReloadLevel", 0);
+
+        moveSpeed = 5f * (1f + 0.025f * moveSpeedLevel);
+        attackMultiplier = 1f + 0.1f * attackLevel;
+        maxHP = 100f * (1f + 0.1f * hpLevel);
+        reloadSpeedMultiplier = Mathf.Max(0.5f, 1f - 0.05f * reloadLevel);
+
+        curHP = maxHP;
     }
 }

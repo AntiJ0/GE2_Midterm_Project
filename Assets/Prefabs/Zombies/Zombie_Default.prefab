@@ -53,6 +53,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fillImage: {fileID: 5632729729989736558}
+  hideDistance: 27
 --- !u!223 &7431409387972660921
 Canvas:
   m_ObjectHideFlags: 0

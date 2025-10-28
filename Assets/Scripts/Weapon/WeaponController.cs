@@ -12,7 +12,7 @@ public class WeaponController : MonoBehaviour
     public float baseAttackDamage = 10f;
 
     [Header("이펙트 설정")]
-    public GameObject muzzleFlashPrefab;     
+    public GameObject muzzleFlashPrefab;
     public float muzzleFlashDuration = 0.05f;
 
     public Vector3 muzzleLocalPosition = Vector3.zero;
@@ -34,6 +34,9 @@ public class WeaponController : MonoBehaviour
     {
         if (player == null) return;
         if (player.isReloading) return;
+
+        if (GameController.Instance != null && GameController.Instance.BlockGameplayInput)
+            return;
 
         if (Input.GetButton("Fire1") && Time.time >= nextFireTime)
         {
@@ -67,13 +70,13 @@ public class WeaponController : MonoBehaviour
         if (muzzleFlashPrefab != null)
         {
             GameObject flash = Instantiate(muzzleFlashPrefab, firePoint, false);
-            flash.transform.localPosition = muzzleLocalPosition;         
+            flash.transform.localPosition = muzzleLocalPosition;
             flash.transform.localRotation = Quaternion.Euler(muzzleLocalEuler);
 
             if (keepPrefabWorldScale)
             {
                 Vector3 parentLossy = firePoint.lossyScale;
-                Vector3 desired = muzzleFlashPrefab.transform.localScale; 
+                Vector3 desired = muzzleFlashPrefab.transform.localScale;
                 flash.transform.localScale = new Vector3(
                     desired.x / Mathf.Max(parentLossy.x, 1e-6f),
                     desired.y / Mathf.Max(parentLossy.y, 1e-6f),
@@ -86,7 +89,7 @@ public class WeaponController : MonoBehaviour
 
         player.ConsumeAmmo();
 
-        float actualFireRate = baseFireRate / player.reloadSpeedMultiplier;
+        float actualFireRate = baseFireRate;
         nextFireTime = Time.time + actualFireRate;
     }
 
@@ -96,10 +99,6 @@ public class WeaponController : MonoBehaviour
         if (player.isReloading) yield break;
 
         player.isReloading = true;
-        Debug.Log("재장전 중...");
-
         yield return player.StartCoroutine(player.ReloadCoroutine());
-
-        Debug.Log("재장전 완료!");
     }
 }
