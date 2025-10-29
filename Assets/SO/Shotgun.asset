@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 675b623a3b4b6f5408085134fa82de42, type: 3}
+  m_Name: Shotgun
+  m_EditorClassIdentifier: 
+  weaponType: 1
+  weaponModelPrefab: {fileID: 6482462969762088165, guid: 85a94b34e05e3df49bf5eeac75a04bab, type: 3}
+  bulletPrefab: {fileID: 5142606003246112731, guid: dd79710197e96b048b9759023360b287, type: 3}
+  muzzleFlashPrefab: {fileID: 6510272545059777916, guid: d7a66338fcc960c499664d41df17e3c2, type: 3}
+  muzzleLightPrefab: {fileID: 4785527085800589669, guid: d713e3f5714af3d47a20f5f9ef908043, type: 3}
+  modelLocalPosition: {x: 1, y: -0.8, z: 1.8}
+  firePointPath: firePoint
+  muzzleForwardOffset: 0.03
+  baseDamage: 5
+  fireRate: 1
+  reloadTime: 3.5
+  maxAmmo: 7
+  bulletSpeed: 50
+  bulletLifetime: 0.2
+  isAutomatic: 0
+  isShotgun: 1
+  pelletCount: 10
+  pelletSpreadAngle: 6

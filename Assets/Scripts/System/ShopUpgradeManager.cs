@@ -18,6 +18,16 @@ public class ShopUpgradeManager : MonoBehaviour
     public Button hpButton;
     public Button reloadButton;
 
+    [Header("무기 구매 버튼")]
+    public Button shotgunButton;
+    public Button assaultButton;
+    public GameObject shotgunLockIcon;
+    public GameObject assaultLockIcon;
+
+    [Header("무기 구매 가격")]
+    public int shotgunCost = 1000;
+    public int assaultCost = 2500;
+
     [Header("업그레이드 표시 텍스트")]
     public TMP_Text moveSpeedLevelText;
     public TMP_Text moveSpeedEffectText;
@@ -34,6 +44,10 @@ public class ShopUpgradeManager : MonoBehaviour
     public TMP_Text reloadLevelText;
     public TMP_Text reloadEffectText;
     public TMP_Text reloadCostText;
+
+    [Header("무기 구매 텍스트")]
+    public TMP_Text shotgunCostText;
+    public TMP_Text assaultCostText;
 
     [Header("업그레이드 비용 (1회당)")]
     public int moveSpeedCost = 200;
@@ -64,6 +78,7 @@ public class ShopUpgradeManager : MonoBehaviour
 
         LoadUpgrades();
         UpdateUI();
+        UpdateWeaponButtons();
     }
 
     private void Update()
@@ -72,6 +87,7 @@ public class ShopUpgradeManager : MonoBehaviour
         if (totalGoldText != null)
             totalGoldText.text = $"{currentGold} G";
     }
+
 
     private void LoadUpgrades()
     {
@@ -103,6 +119,7 @@ public class ShopUpgradeManager : MonoBehaviour
         player.maxHP = 100f * (1f + hpLevel * 0.1f);
         player.reloadSpeedMultiplier = Mathf.Max(0.5f, 1f - 0.05f * reloadLevel);
     }
+
 
     private void UpdateUI()
     {
@@ -136,9 +153,87 @@ public class ShopUpgradeManager : MonoBehaviour
     {
         if (button == null) return;
         button.interactable = !isMaxed;
-
         if (isMaxed)
             button.image.color = maxedButtonColor;
+    }
+
+
+    private void UpdateWeaponButtons()
+    {
+        bool shotgunPurchased = PlayerPrefs.GetInt("ShotgunPurchased", 0) == 1;
+        bool assaultPurchased = PlayerPrefs.GetInt("AssaultPurchased", 0) == 1;
+
+        shotgunButton.interactable = !shotgunPurchased;
+        shotgunCostText.text = shotgunPurchased ? "구매 완료" : $"{shotgunCost} G";
+        if (shotgunLockIcon != null)
+            shotgunLockIcon.SetActive(false);
+
+        bool assaultLocked = !shotgunPurchased;
+        assaultButton.interactable = !assaultPurchased && !assaultLocked;
+        assaultCostText.text = assaultPurchased ? "구매 완료" : $"{assaultCost} G";
+
+        if (assaultLockIcon != null)
+        {
+            assaultLockIcon.SetActive(assaultLocked);
+            assaultLockIcon.transform.SetAsLastSibling(); 
+        }
+
+        if (assaultLocked)
+            assaultButton.image.color = new Color(0.5f, 0.5f, 0.5f);
+        else
+            assaultButton.image.color = normalButtonColor;
+    }
+
+    public void BuyShotgun()
+    {
+        TryBuyWeapon("ShotgunPurchased", shotgunCost, WeaponType.Shotgun);
+    }
+
+    public void BuyAssaultRifle()
+    {
+        bool shotgunPurchased = PlayerPrefs.GetInt("ShotgunPurchased", 0) == 1;
+        if (!shotgunPurchased)
+        {
+            Debug.Log("샷건 미구매 상태에서는 돌격소총 구매 불가!");
+            return;
+        }
+
+        TryBuyWeapon("AssaultPurchased", assaultCost, WeaponType.AssaultRifle);
+    }
+
+    private void TryBuyWeapon(string key, int cost, WeaponType weaponType)
+    {
+        int gold = player != null ? player.totalGold : totalGoldLocal;
+
+        if (gold >= cost)
+        {
+            gold -= cost;
+            if (player != null)
+                player.totalGold = gold;
+            else
+                totalGoldLocal = gold;
+
+            PlayerPrefs.SetInt(key, 1);
+            PlayerPrefs.SetInt("CurrentWeapon", (int)weaponType);
+            PlayerPrefs.SetInt("TotalGold", gold);
+            PlayerPrefs.Save();
+
+            Debug.Log($"{weaponType} 구매 완료!");
+            UpdateWeaponButtons();
+        }
+        else
+        {
+            StartCoroutine(ShowGoldWarning());
+        }
+    }
+
+    private IEnumerator ShowGoldWarning()
+    {
+        isShowingGoldWarning = true;
+        notEnoughGoldText.SetActive(true);
+        yield return new WaitForSecondsRealtime(1f);
+        notEnoughGoldText.SetActive(false);
+        isShowingGoldWarning = false;
     }
 
     public void UpgradeMoveSpeed() => TryUpgrade(ref moveSpeedLevel, moveSpeedCost);
@@ -173,15 +268,4 @@ public class ShopUpgradeManager : MonoBehaviour
                 StartCoroutine(ShowGoldWarning());
         }
     }
-
-    private IEnumerator ShowGoldWarning()
-    {
-        Debug.Log("골드 부족!");
-        isShowingGoldWarning = true;
-        notEnoughGoldText.SetActive(true);
-        yield return new WaitForSecondsRealtime(1f); 
-        notEnoughGoldText.SetActive(false);
-        isShowingGoldWarning = false;
-    }
-
 }

@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 10e5321225824af4884c2831ebf83b4c, type: 3}
-  m_Name: MegaZombie
+  m_Name: ArmoredZombie
   m_EditorClassIdentifier: 
-  zombieName: MegaZombie
-  maxHP: 1000
-  moveSpeed: 2
-  attackDamage: 80
-  attackRange: 5
-  attackCooldown: 3
-  isBoss: 1
-  rewardGold: 500
+  zombieName: ArmoredZombie
+  maxHP: 150
+  moveSpeed: 3
+  attackDamage: 30
+  attackRange: 2
+  attackCooldown: 2
+  isBoss: 0
+  rewardGold: 50

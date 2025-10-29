@@ -10,12 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 10e5321225824af4884c2831ebf83b4c, type: 3}
-  m_Name: NormalZombie
+  m_Name: FastZombie
   m_EditorClassIdentifier: 
-  zombieName: NormalZombie
-  maxHP: 30
-  moveSpeed: 3
-  attackDamage: 20
+  zombieName: FastZombie
+  maxHP: 20
+  moveSpeed: 8
+  attackDamage: 15
   attackRange: 2
-  attackCooldown: 2
+  attackCooldown: 1
   isBoss: 0
+  rewardGold: 10

@@ -13,8 +13,10 @@ public class PlayerPrefsEditor : MonoBehaviour
         if (player != null)
         {
             player.totalGold = newGold;
-            player.UpdateUI(); 
+            player.UpdateUI();
         }
+
+        Debug.Log($"골드가 추가되었습니다. 현재 총 골드: {newGold}");
     }
 
     [ContextMenu("Reset All PlayerPrefs")]
@@ -31,5 +33,14 @@ public class PlayerPrefsEditor : MonoBehaviour
         }
 
         Debug.Log("모든 PlayerPrefs 데이터가 초기화되었습니다.");
+    }
+
+    [ContextMenu("Set HighestClearedStage to 5")]
+    void SetMaxClearedStage()
+    {
+        PlayerPrefs.SetInt("HighestClearedStage", 5);
+        PlayerPrefs.Save();
+
+        Debug.Log("클리어한 최대 스테이지가 5로 설정되었습니다.");
     }
 }

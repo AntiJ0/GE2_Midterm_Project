@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
@@ -26,6 +27,7 @@ public class GameController : MonoBehaviour
         public int minute;
         public List<ZombieSpawner> spawnersToActivate = new List<ZombieSpawner>();
     }
+
     public List<TimedSpawnerGroup> timedSpawnerGroups = new List<TimedSpawnerGroup>();
 
     private bool hordeTriggered = false;
@@ -41,8 +43,12 @@ public class GameController : MonoBehaviour
     private bool isCleared = false;
     private PlayerController player;
 
-    public bool BlockGameplayInput { get; private set; } = false; 
-    private float inputUnscaledBlockRemain = 0f;                  
+    public bool BlockGameplayInput { get; private set; } = false;
+    private float inputUnscaledBlockRemain = 0f;
+
+    [Header("스테이지 번호 설정")]
+    [Tooltip("현재 스테이지 번호를 수동으로 지정 (예: Stage1이면 1)")]
+    public int currentStageNumber = 1;
 
     private void Awake()
     {
@@ -60,7 +66,6 @@ public class GameController : MonoBehaviour
         if (pausePanel != null) pausePanel.SetActive(false);
 
         HideCursor();
-
         StartCoroutine(TimeRoutine());
     }
 
@@ -132,9 +137,18 @@ public class GameController : MonoBehaviour
         {
             isCleared = true;
             Time.timeScale = 0f;
-
             BlockGameplayInput = true;
             ShowCursor();
+
+            if (StageManager.Instance != null)
+            {
+                StageManager.Instance.ClearStage(currentStageNumber);
+                Debug.Log($"Stage {currentStageNumber} 클리어 기록 저장 완료");
+            }
+            else
+            {
+                Debug.LogWarning("StageManager 인스턴스를 찾을 수 없습니다. 클리어 기록이 저장되지 않았습니다.");
+            }
 
             if (clearPanel != null)
             {
@@ -142,6 +156,7 @@ public class GameController : MonoBehaviour
                 if (clearGoldText != null && player != null)
                     clearGoldText.text = $"획득 골드: {player.stageGold} G";
             }
+
             Debug.Log("스테이지 클리어!");
         }
     }
@@ -154,7 +169,7 @@ public class GameController : MonoBehaviour
         {
             inputUnscaledBlockRemain -= Time.unscaledDeltaTime;
             if (inputUnscaledBlockRemain <= 0f)
-                BlockGameplayInput = isPaused || isCleared; 
+                BlockGameplayInput = isPaused || isCleared;
         }
     }
 
@@ -163,13 +178,9 @@ public class GameController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape) && !isCleared)
         {
             if (!isPaused)
-            {
                 PauseGame();
-            }
             else
-            {
                 ResumeGame();
-            }
         }
     }
 
@@ -177,8 +188,7 @@ public class GameController : MonoBehaviour
     {
         Time.timeScale = 0f;
         isPaused = true;
-
-        BlockGameplayInput = true; 
+        BlockGameplayInput = true;
         ShowCursor();
 
         if (pausePanel != null)
@@ -201,7 +211,7 @@ public class GameController : MonoBehaviour
         if (pausePanel != null)
             pausePanel.SetActive(false);
 
-        HideCursor(); 
+        HideCursor();
     }
 
     public void OnReturnToMainMenu()
@@ -215,7 +225,7 @@ public class GameController : MonoBehaviour
         }
 
         Time.timeScale = 1f;
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Main_Menu");
+        SceneManager.LoadScene("Main_Menu");
     }
 
     private void ShowCursor()

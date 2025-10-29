@@ -212,6 +212,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2248137480448059885}
+  - component: {fileID: 7643468486815477027}
   - component: {fileID: 5058537847716336727}
   - component: {fileID: 59518257997292604}
   - component: {fileID: 844185374054902253}
@@ -239,6 +240,24 @@ Transform:
   - {fileID: 3831675691260261747}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7643468486815477027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3858871564346493174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c94c02fe0bd10e47994607302ca66f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  library: {fileID: 0}
+  weaponData: {fileID: 0}
+  aimMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  weaponLayerName: Weapon
 --- !u!114 &5058537847716336727
 MonoBehaviour:
   m_ObjectHideFlags: 0

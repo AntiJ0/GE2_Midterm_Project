@@ -9,24 +9,24 @@ EditorBuildSettings:
     path: Assets/Scenes/Main_Menu.unity
     guid: 438735491b413c241ab32e026ab8b8ea
   - enabled: 1
-    path: Assets/Scenes/Test_Scene.unity
+    path: Assets/Scenes/TestScene.unity
     guid: 1b7698faa84fb4046a4c8e18c78cc288
   - enabled: 1
     path: Assets/Scenes/Shop_Scene.unity
     guid: 43e5f6b537481c64cb43006c21fd9821
   - enabled: 1
     path: Assets/Scenes/Stage_1.unity
-    guid: 7ed4f02c689c10542b5a55802f996f64
+    guid: 18119674973fa2448828d78df4a9dee7
   - enabled: 1
     path: Assets/Scenes/Stage_2.unity
-    guid: ae7c6365f3b31a0448892a10b80083dc
+    guid: 5b5ccd08ced7dd3468da49d6c37375a3
   - enabled: 1
     path: Assets/Scenes/Stage_3.unity
-    guid: 2b31e0a0f9dde4944850c29ca0680d80
+    guid: b64f8d68b1e3c0f439752bcf9900e5e5
   - enabled: 1
     path: Assets/Scenes/Stage_4.unity
-    guid: cd058c2ca20cf8c4e925555ae7674504
+    guid: 70bd26b0c20fd044ea96da0b4c09f2fc
   - enabled: 1
     path: Assets/Scenes/Stage_5.unity
-    guid: d679e414c27ef2c489137059c21d563b
+    guid: 749d43f21843c3648b22b08dcaa8e053
   m_configObjects: {}

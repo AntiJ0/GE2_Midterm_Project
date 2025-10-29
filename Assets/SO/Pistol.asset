@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 675b623a3b4b6f5408085134fa82de42, type: 3}
+  m_Name: Pistol
+  m_EditorClassIdentifier: 
+  weaponType: 0
+  weaponModelPrefab: {fileID: 5702803081478820409, guid: 9333a6ccfce5b9e458ca9d1412380db1, type: 3}
+  bulletPrefab: {fileID: 5142606003246112731, guid: dd79710197e96b048b9759023360b287, type: 3}
+  muzzleFlashPrefab: {fileID: 6510272545059777916, guid: d7a66338fcc960c499664d41df17e3c2, type: 3}
+  muzzleLightPrefab: {fileID: 4785527085800589669, guid: d713e3f5714af3d47a20f5f9ef908043, type: 3}
+  modelLocalPosition: {x: 0.7, y: -0.5, z: 1}
+  firePointPath: firePoint
+  muzzleForwardOffset: 0.03
+  baseDamage: 10
+  fireRate: 0.5
+  reloadTime: 2
+  maxAmmo: 13
+  bulletSpeed: 50
+  bulletLifetime: 2
+  isAutomatic: 0
+  isShotgun: 0
+  pelletCount: 10
+  pelletSpreadAngle: 6
