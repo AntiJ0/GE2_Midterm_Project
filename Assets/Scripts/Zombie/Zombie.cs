@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.UI;
+using System.Collections;
 
 public class Zombie : MonoBehaviour
 {
@@ -17,6 +16,8 @@ public class Zombie : MonoBehaviour
     private Color originalColor;
     private bool isFlashing = false;
 
+    private const float NavMeshSnapRadius = 3f; 
+
     public void Initialize(ZombieSO so)
     {
         data = so;
@@ -24,9 +25,8 @@ public class Zombie : MonoBehaviour
 
         agent = GetComponent<NavMeshAgent>();
         rb = GetComponent<Rigidbody>();
-        if (agent != null)
-            agent.speed = data.moveSpeed;
 
+        if (agent != null) agent.speed = data.moveSpeed;
         if (rb != null)
         {
             rb.isKinematic = true;
@@ -34,19 +34,37 @@ public class Zombie : MonoBehaviour
             rb.freezeRotation = true;
         }
 
+        EnsurePlacedOnNavMesh();
+
         healthBar = GetComponentInChildren<ZombieHealthBar>();
-        if (healthBar != null)
-            healthBar.UpdateHealthBar(curHP, data.maxHP);
+        if (healthBar != null) healthBar.UpdateHealthBar(curHP, data.maxHP);
 
         renderers = GetComponentsInChildren<Renderer>();
-        if (renderers.Length > 0)
-            originalColor = renderers[0].material.color;
+        if (renderers.Length > 0) originalColor = renderers[0].material.color;
+    }
+
+    private void EnsurePlacedOnNavMesh()
+    {
+        if (agent == null) return;
+
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(transform.position, out hit, NavMeshSnapRadius, NavMesh.AllAreas))
+        {
+            agent.Warp(hit.position); 
+        }
+        else
+        {
+            Debug.LogWarning($"[Zombie] Spawned off NavMesh at {transform.position}. Disabling agent.", this);
+            agent.enabled = false;
+        }
     }
 
     void Update()
     {
         if (data == null) return;
         if (isAttacking) return;
+
+        if (agent == null || !agent.enabled || !agent.isOnNavMesh) return;
 
         FindClosestPlayer();
 
@@ -80,66 +98,58 @@ public class Zombie : MonoBehaviour
                 nearest = p.transform;
             }
         }
-
         target = nearest;
     }
 
     IEnumerator Attack()
     {
         isAttacking = true;
-        agent.isStopped = true;
+
+        if (agent != null && agent.enabled && agent.isOnNavMesh)
+            agent.isStopped = true;
 
         yield return new WaitForSeconds(1.5f);
 
         if (target != null)
         {
-            PlayerController player = target.GetComponent<PlayerController>();
-            if (player != null)
-            {
-                player.TakeDamage(data.attackDamage);
-            }
+            var player = target.GetComponent<PlayerController>();
+            if (player != null) player.TakeDamage(data.attackDamage);
         }
 
         yield return new WaitForSeconds(data.attackCooldown - 1.5f);
 
-        agent.isStopped = false;
+        if (agent != null && agent.enabled && agent.isOnNavMesh)
+            agent.isStopped = false;
+
         isAttacking = false;
     }
 
     public void TakeDamage(float amount)
     {
         curHP -= amount;
-        if (healthBar != null)
-            healthBar.UpdateHealthBar(curHP, data.maxHP);
+        if (healthBar != null) healthBar.UpdateHealthBar(curHP, data.maxHP);
 
-        if (!isFlashing)
-            StartCoroutine(FlashRed());
+        if (!isFlashing) StartCoroutine(FlashRed());
 
-        if (curHP <= 0)
-        {
-            OnDeath();
-        }
+        if (curHP <= 0) OnDeath();
     }
 
     void OnDeath()
     {
         if (target != null)
         {
-            PlayerController player = target.GetComponent<PlayerController>();
-            if (player != null)
-                player.AddGold(data.rewardGold);
+            var player = target.GetComponent<PlayerController>();
+            if (player != null) player.AddGold(data.rewardGold);
         }
-
         Destroy(gameObject);
     }
 
     IEnumerator FlashRed()
     {
         isFlashing = true;
-
         foreach (Renderer rend in renderers)
         {
-            MaterialPropertyBlock block = new MaterialPropertyBlock();
+            var block = new MaterialPropertyBlock();
             rend.GetPropertyBlock(block);
             block.SetColor("_Color", Color.red);
             rend.SetPropertyBlock(block);
@@ -149,12 +159,11 @@ public class Zombie : MonoBehaviour
 
         foreach (Renderer rend in renderers)
         {
-            MaterialPropertyBlock block = new MaterialPropertyBlock();
+            var block = new MaterialPropertyBlock();
             rend.GetPropertyBlock(block);
             block.SetColor("_Color", originalColor);
             rend.SetPropertyBlock(block);
         }
-
         isFlashing = false;
     }
 
